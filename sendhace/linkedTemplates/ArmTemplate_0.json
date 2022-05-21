@@ -1,0 +1,133 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "sendhace"
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CodigoForm",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FechaInicio",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Ubicacion",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Pregunta",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ValorRespuesta",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ValorSeleccionado",
+						"type": "varchar"
+					},
+					{
+						"name": "ValoresCombinados",
+						"type": "nvarchar"
+					},
+					{
+						"name": "fila",
+						"type": "nvarchar"
+					},
+					{
+						"name": "columna",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Digitador",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DigitadorID",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "query para dash"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/powerquery1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "WranglingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"name": "AzureSqlTable1",
+							"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~>  AzureSqlTable1",
+							"dataset": {
+								"referenceName": "AzureSqlTable1",
+								"type": "DatasetReference"
+							}
+						}
+					],
+					"script": "section Section1;\r\nshared AzureSqlTable1 = let AdfDoc = Sql.Database(\"sendhace.database.windows.net\", \"sendhace\", [CreateNavigationProperties = false]), InputTable = AdfDoc{[Schema=\"dbo\",Item=\"query para dash\"]}[Data] in InputTable;\r\nshared UserQuery = let Source = #\"AzureSqlTable1\",\r\n  #\"Replaced value\" = Table.ReplaceValue(Source, null, \"\", Replacer.ReplaceValue, {\"ValoresCombinados\", \"fila\", \"columna\"}),\r\n  #\"Added custom\" = Table.AddColumn(#\"Replaced value\", \"Custom\", each [Pregunta] & \" - \" & [fila] & \" - \" & [columna]),\r\n  #\"Inserted conditional column\" = Table.AddColumn(#\"Added custom\", \"Custom (2)\", each if [ValoresCombinados] <> \"\" then [ValoresCombinados] else if [ValorSeleccionado] <> \"\" then [ValorSeleccionado] else [ValorRespuesta]),\r\n  #\"Removed columns\" = Table.RemoveColumns(#\"Inserted conditional column\", {\"Ubicacion\", \"ValorRespuesta\", \"ValorSeleccionado\", \"ValoresCombinados\", \"fila\", \"columna\", \"DigitadorID\", \"Pregunta\"}) in #\"Removed columns\";\r\n",
+					"documentLocale": "en-us"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]"
+			]
+		}
+	]
+}
