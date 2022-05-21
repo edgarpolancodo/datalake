@@ -1,0 +1,70 @@
+{
+	"name": "AzureSqlTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "CodigoForm",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FechaInicio",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "Ubicacion",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Pregunta",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ValorRespuesta",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ValorSeleccionado",
+				"type": "varchar"
+			},
+			{
+				"name": "ValoresCombinados",
+				"type": "nvarchar"
+			},
+			{
+				"name": "fila",
+				"type": "nvarchar"
+			},
+			{
+				"name": "columna",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Digitador",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DigitadorID",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "query para dash"
+		}
+	}
+}
