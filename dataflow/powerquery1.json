@@ -1,0 +1,20 @@
+{
+	"name": "powerquery1",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "AzureSqlTable1",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~>  AzureSqlTable1",
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"script": "section Section1;\r\nshared AzureSqlTable1 = let AdfDoc = Sql.Database(\"sendhace.database.windows.net\", \"sendhace\", [CreateNavigationProperties = false]), InputTable = AdfDoc{[Schema=\"dbo\",Item=\"query para dash\"]}[Data] in InputTable;\r\nshared UserQuery = let Source = #\"AzureSqlTable1\",\r\n  #\"Replaced value\" = Table.ReplaceValue(Source, null, \"\", Replacer.ReplaceValue, {\"ValoresCombinados\", \"fila\", \"columna\"}),\r\n  #\"Added custom\" = Table.AddColumn(#\"Replaced value\", \"Custom\", each [Pregunta] & \" - \" & [fila] & \" - \" & [columna]),\r\n  #\"Inserted conditional column\" = Table.AddColumn(#\"Added custom\", \"Custom (2)\", each if [ValoresCombinados] <> \"\" then [ValoresCombinados] else if [ValorSeleccionado] <> \"\" then [ValorSeleccionado] else [ValorRespuesta]),\r\n  #\"Removed columns\" = Table.RemoveColumns(#\"Inserted conditional column\", {\"Ubicacion\", \"ValorRespuesta\", \"ValorSeleccionado\", \"ValoresCombinados\", \"fila\", \"columna\", \"DigitadorID\"}),\r\n  #\"Pivoted column\" = Table.Pivot(Table.TransformColumnTypes(#\"Removed columns\", {{\"Custom\", type text}}), List.Distinct(Table.TransformColumnTypes(#\"Removed columns\", {{\"Custom\", type text}})[Custom]), \"Custom\", \"Custom (2)\") in #\"Pivoted column\";\r\n",
+			"documentLocale": "en-us"
+		}
+	}
+}
