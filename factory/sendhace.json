@@ -1,0 +1,9 @@
+{
+	"name": "sendhace",
+	"location": "eastus2",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "dfbdffcc-4422-41c0-a5b5-c0487f7611f3",
+		"tenantId": "e4e57521-cb14-4e8d-a6b7-20da0f049e4a"
+	}
+}
